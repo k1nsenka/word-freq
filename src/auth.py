@@ -1,4 +1,4 @@
-def outh(keys_path):
+def auth_keys(keys_path):
     with open(keys_path, 'r') as f:
         lines = f.read().splitlines()
         CK = lines[0]
@@ -6,9 +6,3 @@ def outh(keys_path):
         AT = lines[2]
         ATS = lines[3]
     return CK, CKS, AT, ATS
-
-CK, CKS, AT, ATS = outh('../key/keys.txt')
-print(CK)
-print(CKS)
-print(AT)
-print(ATS)

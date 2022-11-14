@@ -6,14 +6,12 @@
 # API日本語訳
 # http://westplain.sakuraweb.com/translate/twitter/Documentation/REST-APIs/Public-API/REST-APIs.cgi
 
-
-
 import urllib
 from requests_oauthlib import OAuth1
 import requests
 import sys
 
-def search_tweets(self, CK, CKS, AT, ATS, word, count, range):
+def search_tweets(CK, CKS, AT, ATS, word, count, range):
     # 文字列設定
     word += ' exclude:retweets' # RTは除く
     word = urllib.parse.quote_plus(word)
@@ -21,7 +19,11 @@ def search_tweets(self, CK, CKS, AT, ATS, word, count, range):
     url = "https://api.twitter.com/1.1/search/tweets.json?lang=ja&q="+word+"&count="+str(count)
     auth = OAuth1(CK, CKS, AT, ATS)
     response = requests.get(url, auth=auth)
-    data = response.json()['statuses']
+    data = response.json()
+    if not 'statuses' in data:
+        print(data)# {'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}
+        sys.exit() # あるいはちゃんとSleepする
+    data = data['statuses']
     # 2回目以降のリクエスト
     cnt = 0
     tweets = []
@@ -37,7 +39,11 @@ def search_tweets(self, CK, CKS, AT, ATS, word, count, range):
         url = "https://api.twitter.com/1.1/search/tweets.json?lang=ja&q="+word+"&count="+str(count)+"&max_id="+str(maxid)
         response = requests.get(url, auth=auth)
         try:
-            data = response.json()['statuses']
+            data = response.json()
+            if not 'statuses' in data:
+                print(data)# {'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}
+                sys.exit() # あるいはちゃんとSleepする
+            data = data['statuses']
         except KeyError: # リクエスト回数が上限に達した場合のデータのエラー処理
             print('上限まで検索しました')
             break
